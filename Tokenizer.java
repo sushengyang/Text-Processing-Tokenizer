@@ -23,7 +23,11 @@ public class Tokenizer {
 
 		tokenizer(seperatedWords);
 		removeEmptyWords();
+		System.out.println("Token");
+		System.out.println(allWords);
 		removeStopWords(stopWords);
+		System.out.println("Remove Stop");
+		System.out.println(allWords);
 		stemWords();
 	}
 	
@@ -102,6 +106,7 @@ public class Tokenizer {
 		for (int j = 0; j < stopWords.length; j++) {
 			for (int i = 0; i < allWords.size(); i++) {
 				if (allWords.get(i).equals(this.stopWords.get(j))) {
+					allWords.remove(i);
 				}
 			}
 		}
