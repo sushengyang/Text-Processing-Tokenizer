@@ -1,43 +1,72 @@
 import java.util.ArrayList;
 
+/**
+ * @author brandonskane
+ * This class tokenizes, removes stop words and then uses the
+ * Porter Stemming Algorithm (via the Stemmer class) to stem words.
+ */
 public class Tokenizer {
 
-	
 	ArrayList<String> allWords;
 	ArrayList<String> stopWords;
-	ArrayList<String> stemWords;
+	ArrayList<String> stemmedWords;
 
+	/**
+	 * @param seperatedWords	the words from the input file. They are potentially dirty
+	 * 							but will be cleaned
+	 * @param stopWords			the stop words list. They must be properly formatted prior
+	 */
 	public Tokenizer(String[] seperatedWords, String[] stopWords) {
 		this.allWords = new ArrayList<String>();
 		this.stopWords = new ArrayList<String>();
-		this.stemWords = new ArrayList<String>();
+		this.stemmedWords = new ArrayList<String>();
 
 		tokenizer(seperatedWords);
 		removeEmptyWords();
 		removeStopWords(stopWords);
 		stemWords();
-		
-
 	}
 	
-	void stemWords(){
-		
+	/**
+	 * @return		All of the final tokens from the stemmedWords list
+	 * 				(the completed product)
+	 */
+	public String getProcessedWords() {
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (String word : stemmedWords) {
+			stringBuilder.append(word + " ");
+		}
+
+		return stringBuilder.toString();
+	}
+
+	/**
+	 * The Stemmer class requires words to be build via chars.
+	 * Go through each word in the the allWords array and create Stemmer objects
+	 * Then convert back to a String and add to stemmedWords (final product state)
+	 */
+	private void stemWords() {
+
 		char[] wordCharArray;
 		Stemmer s = new Stemmer();
-		
-		
+
 		for (String word : allWords) {
 			wordCharArray = word.toCharArray();
-			
-			for (int i = 0; i < word.length(); i++){
-				 s.add(wordCharArray[i]);
+
+			for (int i = 0; i < word.length(); i++) {
+				s.add(wordCharArray[i]);
 			}
 			s.stem();
-			stemWords.add(s.toString());
-		}	
+			stemmedWords.add(s.toString());
+		}
 	}
-	
-	void tokenizer(String[] seperatedWords){
+
+	/**
+	 * Clean the words -- remove paragraphs, split hyphens and remove links
+	 * @param seperatedWords	the raw words from the input file
+	 */
+	private void tokenizer(String[] seperatedWords) {
 		for (String word : seperatedWords) {
 			word = word.replace("\r", "");
 			word = word.replace("\n", "");
@@ -59,23 +88,31 @@ public class Tokenizer {
 			}
 		}
 	}
-	
-	void removeStopWords(String[] stopWords){
-		
+
+	/**
+	 * Removes all instances of stop words from the allWords array
+	 * @param stopWords		the stop words from the stopWord input file
+	 */
+	private void removeStopWords(String[] stopWords) {
+
 		for (String string : stopWords) {
 			this.stopWords.add(string);
 		}
-		
+
 		for (int j = 0; j < stopWords.length; j++) {
 			for (int i = 0; i < allWords.size(); i++) {
-				if(allWords.get(i).equals(this.stopWords.get(j))){
+				if (allWords.get(i).equals(this.stopWords.get(j))) {
 				}
 			}
 		}
-		
+
 	}
 
-	String[] splitHyphenWord(String word) {
+	/**
+	 * @param word		a "word" containing a hyphen to be split
+	 * @return			an array of 2 words after being split from the array
+	 */
+	private String[] splitHyphenWord(String word) {
 		String[] splitWords = null;
 		if (word.contains("-")) {
 			splitWords = word.split("-");
@@ -84,35 +121,26 @@ public class Tokenizer {
 		return splitWords;
 	}
 
-	String cleanString(String word) {
+	/**
+	 * Using regex, remove numbers and non-alphanumeric chars, 
+	 * make lower case and remove trailing spaces
+	 * @param word		the word to "clean"
+	 * @return 			a "cleaned" word
+	 */
+	private String cleanString(String word) {
 		word = word.replaceAll("[0-9]", "");
 		word = word.replaceAll("\\W", "");
 		return word.toLowerCase().trim();
 	}
-	
-	void removeEmptyWords(){
+
+	/**
+	 * If any empty words have made it into the list this will remove them
+	 */
+	private void removeEmptyWords() {
 		for (int i = 0; i < allWords.size(); i++) {
-			if(allWords.get(i).length() == 0){
+			if (allWords.get(i).length() == 0) {
 				allWords.remove(i);
 			}
 		}
 	}
-
-	public String getProcessedWord() {
-		StringBuilder stringBuilder = new StringBuilder();
-		
-		for (String word : stemWords) {
-			stringBuilder.append(word + " ");
-		}
-		
-		return stringBuilder.toString();
-	}
-
-	
-	void print(){
-		for (String word : stemWords) {
-			System.out.println(word);
-		}
-	}
-
 }
