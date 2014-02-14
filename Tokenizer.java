@@ -109,7 +109,7 @@ public class Tokenizer {
 			String wordToTest = allWords.get(i);
 			int index = containsLettersAndNumbers(wordToTest);
 
-			if (index >= 0) {
+			if (index >= 0) { //if less than 0, no digit was found
 				{
 					String[] word = allWords.get(i).split(
 							"(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
