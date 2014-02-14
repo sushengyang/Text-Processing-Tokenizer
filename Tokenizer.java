@@ -77,19 +77,84 @@ public class Tokenizer {
 			if (word.length() != 0 && !word.isEmpty() && !word.equals(" ")
 					&& !word.equals("")) {
 
-				if (word.contains("http://")) {
-					continue;
+				if (word.contains("http://") || word.contains("www.")) {
+					processURL(word);
 				} else {
 					if (word.contains("-")) {
 						String[] splitWords = splitHyphenWord(word);
 						for (String string : splitWords) {
 							allWords.add(cleanString(string));
-						}
+						}	
 					} else {
 						allWords.add(cleanString(word));
 					}
 				}
 			}
+		}
+	
+		finalPassToRemoveAnyAttachedNumbers();
+	}
+	
+	/**
+	 * If a number has been attached to a word, it must be separated.
+	 * The separated word is inserted, in order, into allWords
+	 */
+	private void finalPassToRemoveAnyAttachedNumbers(){
+//		add(int index, E element)
+		
+		for (int i = 0; i < allWords.size(); i++) {
+			String wordToTest = allWords.get(i);
+			int index = containsLettersAndNumbers(wordToTest);
+			
+			if (index >= 0){{
+				String[] word = allWords.get(i).split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+				allWords.set(i, word[0]);
+				allWords.add(i+1, word[1]);
+			}
+
+			}
+		}
+	}
+	
+	/**
+	 * This is a helper method for finalPassToRemoveAnyAttachedNumbers()
+	 * @param wordToTest	A candidate word to split by a digit
+	 * @return				The index of the digit (where to split)
+	 */
+	private int containsLettersAndNumbers(String wordToTest){
+		
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		boolean letterFound = false;
+		
+		for (int i = 0; i < wordToTest.length(); i++) {
+			if (!Character.isLetter(wordToTest.charAt(i))){
+				indexes.add(i);
+			}
+			if (Character.isLetter(wordToTest.charAt(i))) {
+				letterFound = true;
+			}
+		}
+		
+		
+		if(!indexes.isEmpty() && letterFound){
+			return indexes.get(0);
+		}
+		
+		return -1;
+		
+	}
+	
+	
+	
+	private void processURL(String URL){
+		URL = URL.replaceAll("\\W", " ");
+		URL = URL.replaceAll("_", " ");
+		
+		String[] URLs = URL.split(" ");
+		
+		for (String string : URLs) {
+			if(string.length() != 0)
+			allWords.add(cleanString(string));
 		}
 	}
 
@@ -133,7 +198,7 @@ public class Tokenizer {
 	 * @return 			a "cleaned" word
 	 */
 	private String cleanString(String word) {
-		word = word.replaceAll("[0-9]", "");
+//		word = word.replaceAll("[0-9]", "");
 		word = word.replaceAll("\\W", "");
 		return word.toLowerCase().trim();
 	}
